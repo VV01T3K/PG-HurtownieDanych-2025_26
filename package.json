@@ -7,6 +7,6 @@
     "db:down": "cd database && docker-compose down",
     "db:del": "cd database && docker-compose down -v",
     "db:logs": "cd database && docker-compose logs -f",
-    "dev": "bun db:up && cd generator && uv run main.py"
+    "dev": "cd generator && uv run main.py"
   }
 }
