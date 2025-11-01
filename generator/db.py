@@ -1,5 +1,5 @@
 """
-Database connection module for SQL Server using SQLAlchemy and pymssql.
+Database connection module for SQL Server using SQLAlchemy and pyodbc.
 """
 
 from sqlalchemy import create_engine, text
@@ -14,7 +14,7 @@ def create_mssql_engine(
     port: int = 1433,
 ) -> Engine:
     """
-    Create a SQLAlchemy engine for SQL Server using pymssql.
+    Create a SQLAlchemy engine for SQL Server using pyodbc.
 
     Args:
         server: SQL Server hostname or IP address
@@ -38,9 +38,7 @@ def create_mssql_engine(
     from urllib.parse import quote_plus
 
     encoded_password = quote_plus(password)
-    connection_string = (
-        f"mssql+pymssql://{username}:{encoded_password}@{server}:{port}/{database}"
-    )
+    connection_string = f"mssql+pyodbc://{username}:{encoded_password}@{server}:{port}/{database}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
     engine = create_engine(connection_string, echo=False)
     return engine
 
