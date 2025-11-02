@@ -496,19 +496,25 @@ class RailwayDataGenerator:
         self._write_event_csv(snapshot_dir)
 
     def _write_station_csv(self, snapshot_dir: Path) -> None:
-        path = snapshot_dir / "Station.csv"
+        path = snapshot_dir / "Stacja.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
-            writer.writerow(["id", "name", "city"])
+            writer.writerow(["id", "nazwa", "miasto"])
             for station in self.stations:
                 writer.writerow([station.station_id, station.name, station.city])
 
     def _write_crossing_csv(self, snapshot_dir: Path) -> None:
-        path = snapshot_dir / "Crossing.csv"
+        path = snapshot_dir / "Przejazd.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
             writer.writerow(
-                ["id", "has_barriers", "has_light_signals", "is_lit", "speed_limit"]
+                [
+                    "id",
+                    "czy_rogatki",
+                    "czy_sygnalizacja_swietlna",
+                    "czy_oswietlony",
+                    "dopuszczalna_predkosc",
+                ]
             )
             for crossing in sorted(
                 self.crossings.values(), key=lambda c: c.crossing_id
@@ -524,10 +530,10 @@ class RailwayDataGenerator:
                 )
 
     def _write_train_csv(self, snapshot_dir: Path) -> None:
-        path = snapshot_dir / "Train.csv"
+        path = snapshot_dir / "Pociag.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
-            writer.writerow(["id", "name", "train_type", "operator_name"])
+            writer.writerow(["id", "nazwa", "typ_pociagu", "operator"])
             for train_id in sorted(self.trains):
                 train = self.trains[train_id]
                 writer.writerow(
@@ -540,11 +546,11 @@ class RailwayDataGenerator:
                 )
 
     def _write_driver_csv(self, snapshot_dir: Path) -> None:
-        path = snapshot_dir / "Driver.csv"
+        path = snapshot_dir / "Maszynista.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
             writer.writerow(
-                ["id", "first_name", "last_name", "gender", "age", "employment_year"]
+                ["id", "imie", "nazwisko", "plec", "wiek", "rok_zatrudnienia"]
             )
             for driver_id in sorted(self.drivers):
                 driver = self.drivers[driver_id]
@@ -560,10 +566,12 @@ class RailwayDataGenerator:
                 )
 
     def _write_event_csv(self, snapshot_dir: Path) -> None:
-        path = snapshot_dir / "Event.csv"
+        path = snapshot_dir / "Zdarzenie.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
-            writer.writerow(["id", "event_type", "category", "danger_scale"])
+            writer.writerow(
+                ["id", "typ_zdarzenia", "kategoria", "skala_niebezpieczenstwa"]
+            )
             for event_id in sorted(self.events):
                 event_type, category, danger = self.events[event_id]
                 writer.writerow([event_id, event_type, category, danger])
@@ -583,10 +591,10 @@ class RailwayDataGenerator:
         event_mode = "a" if append else "w"
         weather_mode = "a" if append else "w"
 
-        ride_path = snapshot_dir / "Ride.csv"
-        section_path = snapshot_dir / "Ride_Section.csv"
-        event_path = snapshot_dir / "Event_On_Route.csv"
-        weather_path = snapshot_dir / "weather.csv"
+        ride_path = snapshot_dir / "Kurs.csv"
+        section_path = snapshot_dir / "Odcinek_kursu.csv"
+        event_path = snapshot_dir / "Zdarzenie_na_trasie.csv"
+        weather_path = snapshot_dir / "Weather.csv"
 
         ride_file = ride_path.open(ride_mode, newline="", encoding="utf-8")
         section_file = section_path.open(section_mode, newline="", encoding="utf-8")
@@ -602,39 +610,39 @@ class RailwayDataGenerator:
             ride_writer.writerow(
                 [
                     "id",
-                    "route_name",
-                    "time_difference",
-                    "scheduled_departure",
-                    "scheduled_arrival",
-                    "train_id",
-                    "driver_id",
+                    "nazwa_trasy",
+                    "roznica_czasu",
+                    "planowa_data_odjazdu",
+                    "planowa_data_przyjazdu",
+                    "pociag_id",
+                    "maszynista_id",
                 ]
             )
             section_writer.writerow(
                 [
                     "id",
-                    "ride_id",
-                    "section_number",
-                    "departure_station_id",
-                    "arrival_station_id",
-                    "time_difference",
-                    "scheduled_arrival",
-                    "scheduled_departure",
+                    "kurs_id",
+                    "numer_etapu_kursu",
+                    "stacja_wyjazdowa_id",
+                    "stacja_wjazdowa_id",
+                    "roznica_czasu",
+                    "planowa_data_przyjazdu",
+                    "planowa_data_odjazdu",
                 ]
             )
             event_writer.writerow(
                 [
                     "id",
-                    "ride_section_id",
-                    "crossing_id",
-                    "event_id",
-                    "caused_delay",
-                    "injured_count",
-                    "death_count",
-                    "repair_cost",
-                    "emergency_intervention",
-                    "event_date",
-                    "train_speed",
+                    "odcinek_kursu_id",
+                    "przejazd_id",
+                    "zdarzenie_id",
+                    "wywolane_opoznienie",
+                    "liczba_rannych",
+                    "liczba_zgonow",
+                    "koszt_naprawy",
+                    "czy_interwencja_sluzb",
+                    "data",
+                    "predkosc",
                 ]
             )
             weather_writer.writerow(

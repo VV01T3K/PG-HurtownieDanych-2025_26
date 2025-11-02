@@ -9,7 +9,7 @@ services:
       - 5434:1433
     volumes:
       - sqlserverdata:/var/opt/mssql
-      - ../generator/output:/opt/data:ro
+      - /workspaces/PG-HurtownieDanych-2025_26/generator/output:/opt/data
 
 volumes:
   sqlserverdata:

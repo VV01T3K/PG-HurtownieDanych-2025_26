@@ -1,105 +1,102 @@
 -- DROPS
-DROP TABLE IF EXISTS Event_On_Route;
+DROP TABLE IF EXISTS Zdarzenie_na_trasie;
 
 DROP TABLE IF EXISTS Weather;
 
-DROP TABLE IF EXISTS Ride_Section;
+DROP TABLE IF EXISTS Odcinek_kursu;
 
-DROP TABLE IF EXISTS Ride;
+DROP TABLE IF EXISTS Kurs;
 
-DROP TABLE IF EXISTS Train;
+DROP TABLE IF EXISTS Pociag;
 
-DROP TABLE IF EXISTS Driver;
+DROP TABLE IF EXISTS Maszynista;
 
-DROP TABLE IF EXISTS Station;
+DROP TABLE IF EXISTS Stacja;
 
-DROP TABLE IF EXISTS Crossing;
+DROP TABLE IF EXISTS Przejazd;
 
-DROP TABLE IF EXISTS Event;
+DROP TABLE IF EXISTS Zdarzenie;
 GO
 -- CREATES
-CREATE TABLE Train (
+CREATE TABLE Pociag (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    name VARCHAR(20) NOT NULL,
-    train_type VARCHAR(30) NOT NULL,
-    operator_name VARCHAR(40) NOT NULL
+    nazwa VARCHAR(20) NOT NULL,
+    typ_pociagu VARCHAR(30) NOT NULL,
+    operator VARCHAR(40) NOT NULL
 );
 
-CREATE TABLE Driver (
+CREATE TABLE Maszynista (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    first_name VARCHAR(30) NOT NULL,
-    last_name VARCHAR(30) NOT NULL,
-    gender VARCHAR(10) NOT NULL CHECK (gender IN ('man', 'woman')),
-    age INT NOT NULL CHECK (age BETWEEN 18 AND 80),
-    employment_year INT NOT NULL CHECK (
-        employment_year BETWEEN 1900 AND YEAR(GETDATE())
+    imie VARCHAR(30) NOT NULL,
+    nazwisko VARCHAR(30) NOT NULL,
+    plec VARCHAR(10) NOT NULL CHECK (plec IN ('man', 'woman')),
+    wiek INT NOT NULL CHECK (wiek BETWEEN 18 AND 80),
+    rok_zatrudnienia INT NOT NULL CHECK (
+        rok_zatrudnienia BETWEEN 1900 AND YEAR(GETDATE())
     )
 );
 
-CREATE TABLE Crossing (
+CREATE TABLE Przejazd (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    has_barriers BIT NOT NULL,
-    has_light_signals BIT NOT NULL,
-    is_lit BIT NOT NULL,
-    speed_limit INT NOT NULL CHECK (
-        speed_limit BETWEEN 20 AND 100
+    czy_rogatki BIT NOT NULL,
+    czy_sygnalizacja_swietlna BIT NOT NULL,
+    czy_oswietlony BIT NOT NULL,
+    dopuszczalna_predkosc INT NOT NULL CHECK (
+        dopuszczalna_predkosc BETWEEN 20 AND 100
     )
 );
 
-CREATE TABLE Event (
+CREATE TABLE Zdarzenie (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    event_type VARCHAR(30) NOT NULL,
-    category VARCHAR(40) NOT NULL,
-    danger_scale INT NOT NULL CHECK (danger_scale BETWEEN 1 AND 10)
+    typ_zdarzenia VARCHAR(30) NOT NULL,
+    kategoria VARCHAR(40) NOT NULL,
+    skala_niebezpieczenstwa INT NOT NULL CHECK (
+        skala_niebezpieczenstwa BETWEEN 1 AND 10
+    )
 );
 
-CREATE TABLE Ride (
+CREATE TABLE Kurs (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    route_name VARCHAR(40) NOT NULL,
-    time_difference INT NOT NULL,
-    scheduled_departure DATETIME NOT NULL,
-    scheduled_arrival DATETIME,
+    nazwa_trasy VARCHAR(40) NOT NULL,
+    roznica_czasu INT NOT NULL,
+    planowa_data_odjazdu DATETIME NOT NULL,
+    planowa_data_przyjazdu DATETIME,
     --MOZNA BY POZWOLIC NA NULLA JAKO ZE WCALE NIE DOJECHAL 
-    train_id INT NOT NULL REFERENCES Train (id),
-    driver_id INT NOT NULL REFERENCES Driver (id)
+    pociag_id INT NOT NULL REFERENCES Pociag (id),
+    maszynista_id INT NOT NULL REFERENCES Maszynista (id)
 );
 
-CREATE TABLE Station (
+CREATE TABLE Stacja (
     id INT IDENTITY(1, 1) PRIMARY KEY,
-    name VARCHAR(40) NOT NULL,
-    city VARCHAR(40) NOT NULL
+    nazwa VARCHAR(40) NOT NULL,
+    miasto VARCHAR(40) NOT NULL
 );
 
-CREATE TABLE Ride_Section (
+CREATE TABLE Odcinek_kursu (
     id BIGINT IDENTITY(1, 1) PRIMARY KEY,
-    ride_id INT NOT NULL REFERENCES Ride (id),
-    section_number INT NOT NULL,
-    departure_station_id INT REFERENCES Station (id),
-    arrival_station_id INT NOT NULL REFERENCES Station (id),
-    time_difference INT NOT NULL,
-    scheduled_arrival DATETIME NOT NULL,
-    scheduled_departure DATETIME,
+    kurs_id INT NOT NULL REFERENCES Kurs (id),
+    numer_etapu_kursu INT NOT NULL,
+    stacja_wyjazdowa_id INT REFERENCES Stacja (id),
+    stacja_wjazdowa_id INT NOT NULL REFERENCES Stacja (id),
+    roznica_czasu INT NOT NULL,
+    planowa_data_przyjazdu DATETIME NOT NULL,
+    planowa_data_odjazdu DATETIME,
     CONSTRAINT chk_arrival_after_departure CHECK (
-        scheduled_departure IS NULL
-        OR scheduled_arrival > scheduled_departure
+        planowa_data_odjazdu IS NULL
+        OR planowa_data_przyjazdu > planowa_data_odjazdu
     )
 );
 
 CREATE TABLE Weather (
-    --pogladowo chociaz to bedzie w tym .CSV (w teorii mozna by sie pozbyc tych NOT NULLI ale moze niech beda dla wszystkich)
     id BIGINT IDENTITY(1, 1) PRIMARY KEY,
-    ride_section_id BIGINT NOT NULL REFERENCES Ride_Section (id),
-    -- w hurtowni to raczej ten klucz obcy bedzie po stronie przejazdu
-    measurement_date DATETIME NOT NULL,
-    temperature DECIMAL(4, 1) NOT NULL CHECK (
-        temperature BETWEEN -30 AND 50
+    id_odcinka BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
+    data_pomiaru DATETIME NOT NULL,
+    temperatura DECIMAL(4, 1) NOT NULL CONSTRAINT chk_temperatura CHECK (
+        temperatura BETWEEN -30 AND 50
     ),
-    precipitation_amount DECIMAL(4, 1) NOT NULL CHECK (
-        precipitation_amount BETWEEN 0 AND 30
-    ),
-    -- [mm/h]
-    precipitation_type VARCHAR(10) NOT NULL CHECK (
-        precipitation_type IN (
+    ilosc_opadow DECIMAL(4, 1) NOT NULL CONSTRAINT chk_ilosc_opadow CHECK (ilosc_opadow BETWEEN 0 AND 30),
+    typ_opadow VARCHAR(10) NOT NULL CONSTRAINT chk_typ_opadow CHECK (
+        typ_opadow IN (
             'deszcz',
             'snieg',
             'grad',
@@ -108,17 +105,17 @@ CREATE TABLE Weather (
     )
 );
 
-CREATE TABLE Event_On_Route (
+CREATE TABLE Zdarzenie_na_trasie (
     id BIGINT IDENTITY(1, 1) PRIMARY KEY,
-    ride_section_id BIGINT NOT NULL REFERENCES Ride_Section (id),
-    crossing_id INT REFERENCES Crossing (id),
+    odcinek_kursu_id BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
+    przejazd_id INT REFERENCES Przejazd (id),
     --niektore zdarzenia moga nie byc na przejezdzie 
-    event_id INT NOT NULL REFERENCES Event (id),
-    caused_delay INT NOT NULL,
-    injured_count INT NOT NULL,
-    death_count INT NOT NULL,
-    repair_cost DECIMAL(10, 2) NOT NULL,
-    emergency_intervention BIT NOT NULL,
-    event_date DATETIME NOT NULL,
-    train_speed INT NOT NULL
+    zdarzenie_id INT NOT NULL REFERENCES Zdarzenie (id),
+    wywolane_opoznienie INT NOT NULL,
+    liczba_rannych INT NOT NULL,
+    liczba_zgonow INT NOT NULL,
+    koszt_naprawy DECIMAL(10, 2) NOT NULL,
+    czy_interwencja_sluzb BIT NOT NULL,
+    data DATETIME NOT NULL,
+    predkosc INT NOT NULL
 );
