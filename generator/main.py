@@ -104,6 +104,7 @@ def _env_int(name: str, default: int) -> int:
         return default
     return parsed if parsed > 0 else default
 
+
 T1_CONFIG = SnapshotConfig(
     name="T1",
     start=datetime(2023, 1, 1, 0, 0, 0),
@@ -168,8 +169,9 @@ class RailwayDataGenerator:
         self._generate_facts(T1_CONFIG, snapshot_dir=self._snapshot_dir("T1"))
         self._augment_dimensions_for_t2()
         self._write_dimensions("T2")
-        self._prepare_t2_fact_files()
-        self._generate_facts(T2_CONFIG, snapshot_dir=self._snapshot_dir("T2"), append=True)
+        self._generate_facts(
+            T2_CONFIG, snapshot_dir=self._snapshot_dir("T2"), append=False
+        )
 
     # ------------------------------------------------------------------
     # Dimension preparation
@@ -222,7 +224,9 @@ class RailwayDataGenerator:
             station_id += 1
 
         hotspot_count = self.rng.randint(12, 18)
-        self.hotspot_station_ids = set(self.rng.sample([s.station_id for s in self.stations], hotspot_count))
+        self.hotspot_station_ids = set(
+            self.rng.sample([s.station_id for s in self.stations], hotspot_count)
+        )
 
     def _unique_city(self, used_pairs: set[str]) -> Tuple[str, str]:
         for _ in range(10_000):
@@ -270,7 +274,11 @@ class RailwayDataGenerator:
             self.crossings_by_region[crossing.region].append(self.next_crossing_id)
             self.next_crossing_id += 1
 
-        eligible = [cid for cid, meta in self.crossings.items() if meta.is_old and meta.upgrade_target is None]
+        eligible = [
+            cid
+            for cid, meta in self.crossings.items()
+            if meta.is_old and meta.upgrade_target is None
+        ]
         upgrade_count = self.rng.randint(320, 520)
         for cid in self.rng.sample(eligible, upgrade_count):
             self.crossing_upgrade_map[cid] = -1  # placeholder updated later
@@ -333,7 +341,9 @@ class RailwayDataGenerator:
             self.next_train_id += 1
 
     def _apply_train_switches(self) -> None:
-        candidates = [tid for tid, t in self.trains.items() if t["operator_name"] == "PKP Cargo"]
+        candidates = [
+            tid for tid, t in self.trains.items() if t["operator_name"] == "PKP Cargo"
+        ]
         switch_count = min(len(candidates), self.rng.randint(32, 58))
         switched = self.rng.sample(candidates, switch_count)
         for old_id in switched:
@@ -386,7 +396,11 @@ class RailwayDataGenerator:
 
     def _make_driver(self, min_employment_year: int = 1990) -> Dict[str, object]:
         gender = "man" if self.rng.random() < 0.82 else "woman"
-        first_name = self.fake.first_name_male() if gender == "man" else self.fake.first_name_female()
+        first_name = (
+            self.fake.first_name_male()
+            if gender == "man"
+            else self.fake.first_name_female()
+        )
         last_name = self.fake.last_name()
         age = self.rng.randint(23, 62)
         current_year = 2025
@@ -431,7 +445,11 @@ class RailwayDataGenerator:
                 name = f"Linia {sequence[0]}-{sequence[-1]}"
                 used_pairs.add(key)
             section_minutes = [self.rng.randint(12, 45) for _ in range(stops)]
-            self.routes.append(RouteTemplate(name=name, station_ids=sequence, section_minutes=section_minutes))
+            self.routes.append(
+                RouteTemplate(
+                    name=name, station_ids=sequence, section_minutes=section_minutes
+                )
+            )
 
     # ------------------------------------------------------------------
     # Dimensions writing
@@ -457,8 +475,12 @@ class RailwayDataGenerator:
         path = snapshot_dir / "Crossing.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
-            writer.writerow(["id", "has_barriers", "has_light_signals", "is_lit", "speed_limit"])
-            for crossing in sorted(self.crossings.values(), key=lambda c: c.crossing_id):
+            writer.writerow(
+                ["id", "has_barriers", "has_light_signals", "is_lit", "speed_limit"]
+            )
+            for crossing in sorted(
+                self.crossings.values(), key=lambda c: c.crossing_id
+            ):
                 writer.writerow(
                     [
                         crossing.crossing_id,
@@ -476,13 +498,22 @@ class RailwayDataGenerator:
             writer.writerow(["id", "name", "train_type", "operator_name"])
             for train_id in sorted(self.trains):
                 train = self.trains[train_id]
-                writer.writerow([train["id"], train["name"], train["train_type"], train["operator_name"]])
+                writer.writerow(
+                    [
+                        train["id"],
+                        train["name"],
+                        train["train_type"],
+                        train["operator_name"],
+                    ]
+                )
 
     def _write_driver_csv(self, snapshot_dir: Path) -> None:
         path = snapshot_dir / "Driver.csv"
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
-            writer.writerow(["id", "first_name", "last_name", "gender", "age", "employment_year"])
+            writer.writerow(
+                ["id", "first_name", "last_name", "gender", "age", "employment_year"]
+            )
             for driver_id in sorted(self.drivers):
                 driver = self.drivers[driver_id]
                 writer.writerow(
@@ -536,15 +567,17 @@ class RailwayDataGenerator:
         weather_writer = csv.writer(weather_file, lineterminator="\n")
 
         if not append:
-            ride_writer.writerow([
-                "id",
-                "route_name",
-                "time_difference",
-                "scheduled_departure",
-                "scheduled_arrival",
-                "train_id",
-                "driver_id",
-            ])
+            ride_writer.writerow(
+                [
+                    "id",
+                    "route_name",
+                    "time_difference",
+                    "scheduled_departure",
+                    "scheduled_arrival",
+                    "train_id",
+                    "driver_id",
+                ]
+            )
             section_writer.writerow(
                 [
                     "id",
@@ -572,13 +605,15 @@ class RailwayDataGenerator:
                     "train_speed",
                 ]
             )
-            weather_writer.writerow([
-                "id_odcinka",
-                "data_pomiaru",
-                "temperatura",
-                "ilosc_opadow",
-                "typ_opadow",
-            ])
+            weather_writer.writerow(
+                [
+                    "id_odcinka",
+                    "data_pomiaru",
+                    "temperatura",
+                    "ilosc_opadow",
+                    "typ_opadow",
+                ]
+            )
 
         routes_pool = self.routes
         trains_pool = list(self.trains.keys())
@@ -611,7 +646,9 @@ class RailwayDataGenerator:
                 snapshot_end=config.end,
             )
 
-            ride_total_delay = sum(section["delay_minutes"] for section in ride_sections)
+            ride_total_delay = sum(
+                section["delay_minutes"] for section in ride_sections
+            )
             ride_total_delay = max(-20.0, min(ride_total_delay, 360.0))
 
             scheduled_arrival = ride_sections[-1]["scheduled_arrival"]
@@ -688,7 +725,9 @@ class RailwayDataGenerator:
                     [
                         self.next_event_on_route_id,
                         self.next_section_id,
-                        event_data["crossing_id"] if event_data["crossing_id"] is not None else "",
+                        event_data["crossing_id"]
+                        if event_data["crossing_id"] is not None
+                        else "",
                         event_data["event_id"],
                         event_data["caused_delay"],
                         event_data["injured_count"],
@@ -738,7 +777,11 @@ class RailwayDataGenerator:
 
     def _sections_iter(self, route: RouteTemplate) -> Iterator[Tuple[int, int, int]]:
         for idx in range(len(route.station_ids) - 1):
-            yield route.station_ids[idx], route.station_ids[idx + 1], route.section_minutes[idx]
+            yield (
+                route.station_ids[idx],
+                route.station_ids[idx + 1],
+                route.section_minutes[idx],
+            )
 
     # ------------------------------------------------------------------
     # Delay calculation and contributing factors
@@ -753,7 +796,10 @@ class RailwayDataGenerator:
         weather: Dict[str, object],
         scheduled_departure: datetime,
     ) -> float:
-        is_hotspot = dep_station_id in self.hotspot_station_ids or arr_station_id in self.hotspot_station_ids
+        is_hotspot = (
+            dep_station_id in self.hotspot_station_ids
+            or arr_station_id in self.hotspot_station_ids
+        )
         base_noise = self.rng.gauss(0.0, 1.5)
         delay = base_noise + (self.rng.uniform(2, 4) if is_hotspot else 0.0)
 
@@ -806,7 +852,11 @@ class RailwayDataGenerator:
 
         if crossing_meta is not None and crossing_meta.is_old:
             probability *= 1.45
-        if crossing_meta is not None and crossing_meta.upgrade_target is not None and scheduled_departure >= UPGRADE_DATE:
+        if (
+            crossing_meta is not None
+            and crossing_meta.upgrade_target is not None
+            and scheduled_departure >= UPGRADE_DATE
+        ):
             probability *= 0.8
 
         if weather["precipitation_type"] in {"deszcz", "snieg"}:
@@ -820,7 +870,10 @@ class RailwayDataGenerator:
         elif experience > 5:
             probability *= 0.92
 
-        if scheduled_departure >= datetime(2025, 1, 1) and scheduled_departure <= snapshot_end:
+        if (
+            scheduled_departure >= datetime(2025, 1, 1)
+            and scheduled_departure <= snapshot_end
+        ):
             probability *= 0.95
 
         if train["operator_name"] == "POLREGIO":
@@ -906,23 +959,33 @@ class RailwayDataGenerator:
             return self.rng.uniform(1_000, 6_000)
         return self.rng.uniform(500, 3_000)
 
-    def _event_speed(self, train: Dict[str, object], crossing_meta: Optional[CrossingMeta]) -> int:
+    def _event_speed(
+        self, train: Dict[str, object], crossing_meta: Optional[CrossingMeta]
+    ) -> int:
         base_speed = 110 if train["train_type"] == "passenger" else 90
         if crossing_meta is not None:
-            base_speed = min(base_speed, crossing_meta.speed_limit + self.rng.randint(-10, 5))
+            base_speed = min(
+                base_speed, crossing_meta.speed_limit + self.rng.randint(-10, 5)
+            )
         return max(30, min(160, base_speed))
 
     # ------------------------------------------------------------------
     # Crossing selection for sections/events
     # ------------------------------------------------------------------
 
-    def _select_crossing(self, weather: Dict[str, object], scheduled_departure: datetime) -> Optional[int]:
+    def _select_crossing(
+        self, weather: Dict[str, object], scheduled_departure: datetime
+    ) -> Optional[int]:
         region = weather["region"]
         if region not in self.crossings_by_region:
             return None
         crossing_id = self.rng.choice(self.crossings_by_region[region])
         crossing_meta = self.crossings[crossing_id]
-        if crossing_meta.is_old and crossing_meta.upgrade_target and scheduled_departure >= UPGRADE_DATE:
+        if (
+            crossing_meta.is_old
+            and crossing_meta.upgrade_target
+            and scheduled_departure >= UPGRADE_DATE
+        ):
             return crossing_meta.upgrade_target
         return crossing_id
 
@@ -973,7 +1036,9 @@ class RailwayDataGenerator:
     # Weather sampling respecting seasonality and region effects
     # ------------------------------------------------------------------
 
-    def _sample_weather(self, timestamp: datetime, station_id: int) -> Dict[str, object]:
+    def _sample_weather(
+        self, timestamp: datetime, station_id: int
+    ) -> Dict[str, object]:
         station = self._station_by_id(station_id)
         month = timestamp.month
         base_temp = self._base_temperature(month)
@@ -1061,14 +1126,6 @@ class RailwayDataGenerator:
 
     def _snapshot_dir(self, name: str) -> Path:
         return self.output_root / name
-
-    def _prepare_t2_fact_files(self) -> None:
-        for filename in ("Ride.csv", "Ride_Section.csv", "Event_On_Route.csv", "weather.csv"):
-            src = self._snapshot_dir("T1") / filename
-            dst = self._snapshot_dir("T2") / filename
-            with src.open("r", encoding="utf-8") as s, dst.open("w", encoding="utf-8") as d:
-                for line in s:
-                    d.write(line)
 
     # ------------------------------------------------------------------
     # Entry point
