@@ -9,6 +9,7 @@ services:
       - 5434:1433
     volumes:
       - sqlserverdata:/var/opt/mssql
+      - ../generator/output:/opt/data:ro
 
 volumes:
   sqlserverdata:
