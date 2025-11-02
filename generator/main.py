@@ -194,6 +194,7 @@ class RailwayDataGenerator:
         self._apply_crossing_upgrades()
         self._apply_train_switches()
         self._add_new_drivers_for_t2()
+        self._update_driver_surnames_for_t2()
 
     # ------------------------------------------------------------------
     # Station generation
@@ -393,6 +394,37 @@ class RailwayDataGenerator:
             record = self._make_driver(min_employment_year=2023)
             self.drivers[self.next_driver_id] = record
             self.next_driver_id += 1
+
+    def _update_driver_surnames_for_t2(self) -> None:
+        """Update some driver surnames in T2 to simulate data changes over time.
+
+        This represents realistic scenarios like:
+        - Marriage name changes
+        - Legal name changes
+        - Name corrections/updates
+
+        Roughly 5-8% of existing drivers get surname updates.
+        """
+        # Get all drivers that existed in T1 (employment_year < 2023)
+        t1_driver_ids = [
+            driver_id
+            for driver_id, driver in self.drivers.items()
+            if int(driver["employment_year"]) < 2023
+        ]
+
+        if not t1_driver_ids:
+            return
+
+        # Randomly select 5-8% of T1 drivers for surname updates
+        update_count = max(1, int(len(t1_driver_ids) * self.rng.uniform(0.05, 0.08)))
+        drivers_to_update = self.rng.sample(
+            t1_driver_ids, min(update_count, len(t1_driver_ids))
+        )
+
+        for driver_id in drivers_to_update:
+            driver = self.drivers[driver_id]
+            # Generate a new surname (simulating name change)
+            driver["last_name"] = self.fake.last_name()
 
     def _make_driver(self, min_employment_year: int = 1990) -> Dict[str, object]:
         gender = "man" if self.rng.random() < 0.82 else "woman"
