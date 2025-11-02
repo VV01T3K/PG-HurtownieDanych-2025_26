@@ -107,19 +107,19 @@ WITH (
 
 SET IDENTITY_INSERT Odcinek_kursu OFF;
 
--- SET IDENTITY_INSERT Zdarzenie_na_trasie ON;
+SET IDENTITY_INSERT Zdarzenie_na_trasie ON;
 
--- BULK INSERT Zdarzenie_na_trasie
--- FROM '/opt/data/T1/Zdarzenie_na_trasie.csv'
--- WITH (
---         FORMAT = 'CSV',
---         FIRSTROW = 2,
---         FIELDTERMINATOR = ',',
---         ROWTERMINATOR = '\n',
---         TABLOCK
---     );
+BULK INSERT Zdarzenie_na_trasie
+FROM '/opt/data/T1/Zdarzenie_na_trasie.csv'
+WITH (
+        FORMAT = 'CSV',
+        FIRSTROW = 2,
+        FIELDTERMINATOR = ',',
+        ROWTERMINATOR = '\n',
+        TABLOCK
+    );
 
--- SET IDENTITY_INSERT Zdarzenie_na_trasie OFF;
+SET IDENTITY_INSERT Zdarzenie_na_trasie OFF;
 
 -- Re-enable constraints
 ALTER TABLE Zdarzenie_na_trasie CHECK CONSTRAINT ALL;

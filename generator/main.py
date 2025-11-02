@@ -769,7 +769,7 @@ class RailwayDataGenerator:
                         if event_data["crossing_id"] is not None
                         else "",
                         event_data["event_id"],
-                        event_data["caused_delay"],
+                        int(round(event_data["caused_delay"])),
                         event_data["injured_count"],
                         event_data["death_count"],
                         f"{event_data['repair_cost']:.2f}",

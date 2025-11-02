@@ -87,6 +87,21 @@ CREATE TABLE Odcinek_kursu (
     )
 );
 
+CREATE TABLE Zdarzenie_na_trasie (
+    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
+    odcinek_kursu_id BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
+    przejazd_id INT REFERENCES Przejazd (id),
+    --niektore zdarzenia moga nie byc na przejezdzie 
+    zdarzenie_id INT NOT NULL REFERENCES Zdarzenie (id),
+    wywolane_opoznienie INT NOT NULL,
+    liczba_rannych INT NOT NULL,
+    liczba_zgonow INT NOT NULL,
+    koszt_naprawy DECIMAL(10, 2) NOT NULL,
+    czy_interwencja_sluzb BIT NOT NULL,
+    data DATETIME NOT NULL,
+    predkosc INT NOT NULL
+);
+
 CREATE TABLE Weather (
     id_odcinka BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
     data_pomiaru DATETIME NOT NULL,
@@ -103,19 +118,4 @@ CREATE TABLE Weather (
         )
     ),
     PRIMARY KEY (id_odcinka, data_pomiaru)
-);
-
-CREATE TABLE Zdarzenie_na_trasie (
-    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
-    odcinek_kursu_id BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
-    przejazd_id INT REFERENCES Przejazd (id),
-    --niektore zdarzenia moga nie byc na przejezdzie 
-    zdarzenie_id INT NOT NULL REFERENCES Zdarzenie (id),
-    wywolane_opoznienie INT NOT NULL,
-    liczba_rannych INT NOT NULL,
-    liczba_zgonow INT NOT NULL,
-    koszt_naprawy DECIMAL(10, 2) NOT NULL,
-    czy_interwencja_sluzb BIT NOT NULL,
-    data DATETIME NOT NULL,
-    predkosc INT NOT NULL
 );
