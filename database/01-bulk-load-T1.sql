@@ -8,8 +8,6 @@ ALTER TABLE Odcinek_kursu NOCHECK CONSTRAINT ALL;
 
 ALTER TABLE Kurs NOCHECK CONSTRAINT ALL;
 
-ALTER TABLE Weather NOCHECK CONSTRAINT ALL;
-
 -- Disable identity insert to allow specific IDs from CSV
 SET IDENTITY_INSERT Pociag ON;
 
@@ -109,99 +107,10 @@ WITH (
 
 SET IDENTITY_INSERT Odcinek_kursu OFF;
 
-SET IDENTITY_INSERT Zdarzenie_na_trasie ON;
+-- SET IDENTITY_INSERT Zdarzenie_na_trasie ON;
 
-BULK INSERT Zdarzenie_na_trasie
-FROM '/opt/data/T1/Zdarzenie_na_trasie.csv'
-WITH (
-        FORMAT = 'CSV',
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ',',
-        ROWTERMINATOR = '\n',
-        TABLOCK
-    );
-
-SET IDENTITY_INSERT Zdarzenie_na_trasie OFF;
-
--- Re-enable constraints
-ALTER TABLE Zdarzenie_na_trasie CHECK CONSTRAINT ALL;
-
-ALTER TABLE Odcinek_kursu CHECK CONSTRAINT ALL;
-
-ALTER TABLE Kurs CHECK CONSTRAINT ALL;
-
-ALTER TABLE Weather CHECK CONSTRAINT ALL;
-
--- Display summary
-PRINT 'T1 Data Bulk Load Complete';
-
-PRINT 'Pociag records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Pociag
-    ) AS VARCHAR
-);
-
-PRINT 'Maszynista records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Maszynista
-    ) AS VARCHAR
-);
-
-PRINT 'Stacja records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Stacja
-    ) AS VARCHAR
-);
-
-PRINT 'Przejazd records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Przejazd
-    ) AS VARCHAR
-);
-
-PRINT 'Zdarzenie records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Zdarzenie
-    ) AS VARCHAR
-);
-
-PRINT 'Kurs records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Kurs
-    ) AS VARCHAR
-);
-
-PRINT 'Odcinek_kursu records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Odcinek_kursu
-    ) AS VARCHAR
-);
-
-PRINT 'Weather records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Weather
-    ) AS VARCHAR
-);
-
-PRINT 'Zdarzenie_na_trasie records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Zdarzenie_na_trasie
-    ) AS VARCHAR
-);
-
-SET IDENTITY_INSERT Weather ON;
-
--- BULK INSERT Weather
--- FROM '/opt/data/T1/Weather.csv'
+-- BULK INSERT Zdarzenie_na_trasie
+-- FROM '/opt/data/T1/Zdarzenie_na_trasie.csv'
 -- WITH (
 --         FORMAT = 'CSV',
 --         FIRSTROW = 2,
@@ -210,4 +119,21 @@ SET IDENTITY_INSERT Weather ON;
 --         TABLOCK
 --     );
 
--- SET IDENTITY_INSERT Weather OFF;
+-- SET IDENTITY_INSERT Zdarzenie_na_trasie OFF;
+
+-- Re-enable constraints
+ALTER TABLE Zdarzenie_na_trasie CHECK CONSTRAINT ALL;
+
+ALTER TABLE Odcinek_kursu CHECK CONSTRAINT ALL;
+
+ALTER TABLE Kurs CHECK CONSTRAINT ALL;
+
+BULK INSERT Weather
+FROM '/opt/data/T1/Weather.csv'
+WITH (
+        FORMAT = 'CSV',
+        FIRSTROW = 2,
+        FIELDTERMINATOR = ',',
+        ROWTERMINATOR = '\n',
+        TABLOCK
+    );

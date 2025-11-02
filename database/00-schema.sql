@@ -88,7 +88,6 @@ CREATE TABLE Odcinek_kursu (
 );
 
 CREATE TABLE Weather (
-    id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     id_odcinka BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
     data_pomiaru DATETIME NOT NULL,
     temperatura DECIMAL(4, 1) NOT NULL CONSTRAINT chk_temperatura CHECK (
@@ -102,7 +101,8 @@ CREATE TABLE Weather (
             'grad',
             'brak'
         )
-    )
+    ),
+    PRIMARY KEY (id_odcinka, data_pomiaru)
 );
 
 CREATE TABLE Zdarzenie_na_trasie (
