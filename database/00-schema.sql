@@ -18,14 +18,16 @@ DROP TABLE IF EXISTS Przejazd;
 DROP TABLE IF EXISTS Zdarzenie;
 GO
 -- CREATES
-CREATE TABLE Pociag (
+CREATE TABLE Pociag
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     nazwa VARCHAR(20) NOT NULL,
     typ_pociagu VARCHAR(30) NOT NULL,
     operator VARCHAR(40) NOT NULL
 );
 
-CREATE TABLE Maszynista (
+CREATE TABLE Maszynista
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     imie VARCHAR(30) NOT NULL,
     nazwisko VARCHAR(30) NOT NULL,
@@ -36,7 +38,8 @@ CREATE TABLE Maszynista (
     )
 );
 
-CREATE TABLE Przejazd (
+CREATE TABLE Przejazd
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     czy_rogatki BIT NOT NULL,
     czy_sygnalizacja_swietlna BIT NOT NULL,
@@ -46,7 +49,8 @@ CREATE TABLE Przejazd (
     )
 );
 
-CREATE TABLE Zdarzenie (
+CREATE TABLE Zdarzenie
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     typ_zdarzenia VARCHAR(30) NOT NULL,
     kategoria VARCHAR(40) NOT NULL,
@@ -55,7 +59,8 @@ CREATE TABLE Zdarzenie (
     )
 );
 
-CREATE TABLE Kurs (
+CREATE TABLE Kurs
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     nazwa_trasy VARCHAR(40) NOT NULL,
     roznica_czasu INT NOT NULL,
@@ -66,13 +71,15 @@ CREATE TABLE Kurs (
     maszynista_id INT NOT NULL REFERENCES Maszynista (id)
 );
 
-CREATE TABLE Stacja (
+CREATE TABLE Stacja
+(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     nazwa VARCHAR(40) NOT NULL,
     miasto VARCHAR(40) NOT NULL
 );
 
-CREATE TABLE Odcinek_kursu (
+CREATE TABLE Odcinek_kursu
+(
     id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     kurs_id INT NOT NULL REFERENCES Kurs (id),
     numer_etapu_kursu INT NOT NULL,
@@ -87,7 +94,8 @@ CREATE TABLE Odcinek_kursu (
     )
 );
 
-CREATE TABLE Zdarzenie_na_trasie (
+CREATE TABLE Zdarzenie_na_trasie
+(
     id BIGINT IDENTITY(1, 1) PRIMARY KEY,
     odcinek_kursu_id BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
     przejazd_id INT REFERENCES Przejazd (id),
@@ -102,7 +110,8 @@ CREATE TABLE Zdarzenie_na_trasie (
     predkosc INT NOT NULL
 );
 
-CREATE TABLE Weather (
+CREATE TABLE Weather
+(
     id_odcinka BIGINT NOT NULL REFERENCES Odcinek_kursu (id),
     data_pomiaru DATETIME NOT NULL,
     temperatura DECIMAL(4, 1) NOT NULL CONSTRAINT chk_temperatura CHECK (

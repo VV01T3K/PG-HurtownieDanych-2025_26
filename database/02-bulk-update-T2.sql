@@ -12,14 +12,15 @@ ALTER TABLE Kurs NOCHECK CONSTRAINT ALL;
 ALTER TABLE Weather NOCHECK CONSTRAINT ALL;
 
 -- Load new Pociag records from T2
-CREATE TABLE #Pociag_Temp (
+CREATE TABLE Pociag_Temp
+(
     id INT,
     nazwa VARCHAR(20),
     typ_pociagu VARCHAR(30),
     operator VARCHAR(40)
 );
 
-BULK INSERT #Pociag_Temp
+BULK INSERT Pociag_Temp
 FROM '/opt/data/T2/Pociag.csv'
 WITH (
     FORMAT = 'CSV',
@@ -32,7 +33,7 @@ WITH (
 SET IDENTITY_INSERT Pociag ON;
 
 MERGE INTO Pociag AS target
-USING #Pociag_Temp AS source
+USING Pociag_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET nazwa = source.nazwa, typ_pociagu = source.typ_pociagu, operator = source.operator
@@ -41,10 +42,11 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Pociag OFF;
 
-DROP TABLE #Pociag_Temp;
+DROP TABLE Pociag_Temp;
 
 -- Update Maszynista records from T2
-CREATE TABLE #Maszynista_Temp (
+CREATE TABLE Maszynista_Temp
+(
     id INT,
     imie VARCHAR(30),
     nazwisko VARCHAR(30),
@@ -53,7 +55,7 @@ CREATE TABLE #Maszynista_Temp (
     rok_zatrudnienia INT
 );
 
-BULK INSERT #Maszynista_Temp
+BULK INSERT Maszynista_Temp
 FROM '/opt/data/T2/Maszynista.csv'
 WITH (
     FORMAT = 'CSV',
@@ -66,7 +68,7 @@ WITH (
 SET IDENTITY_INSERT Maszynista ON;
 
 MERGE INTO Maszynista AS target
-USING #Maszynista_Temp AS source
+USING Maszynista_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET imie = source.imie, nazwisko = source.nazwisko, plec = source.plec, wiek = source.wiek, rok_zatrudnienia = source.rok_zatrudnienia
@@ -75,10 +77,11 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Maszynista OFF;
 
-DROP TABLE #Maszynista_Temp;
+DROP TABLE Maszynista_Temp;
 
 -- Update Przejazd records from T2
-CREATE TABLE #Przejazd_Temp (
+CREATE TABLE Przejazd_Temp
+(
     id INT,
     czy_rogatki BIT,
     czy_sygnalizacja_swietlna BIT,
@@ -86,7 +89,7 @@ CREATE TABLE #Przejazd_Temp (
     dopuszczalna_predkosc INT
 );
 
-BULK INSERT #Przejazd_Temp
+BULK INSERT Przejazd_Temp
 FROM '/opt/data/T2/Przejazd.csv'
 WITH (
     FORMAT = 'CSV',
@@ -99,7 +102,7 @@ WITH (
 SET IDENTITY_INSERT Przejazd ON;
 
 MERGE INTO Przejazd AS target
-USING #Przejazd_Temp AS source
+USING Przejazd_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET czy_rogatki = source.czy_rogatki, czy_sygnalizacja_swietlna = source.czy_sygnalizacja_swietlna, czy_oswietlony = source.czy_oswietlony, dopuszczalna_predkosc = source.dopuszczalna_predkosc
@@ -108,17 +111,18 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Przejazd OFF;
 
-DROP TABLE #Przejazd_Temp;
+DROP TABLE Przejazd_Temp;
 
 -- Update Zdarzenie records from T2
-CREATE TABLE #Zdarzenie_Temp (
+CREATE TABLE Zdarzenie_Temp
+(
     id INT,
     typ_zdarzenia VARCHAR(30),
     kategoria VARCHAR(40),
     skala_niebezpieczenstwa INT
 );
 
-BULK INSERT #Zdarzenie_Temp
+BULK INSERT Zdarzenie_Temp
 FROM '/opt/data/T2/Zdarzenie.csv'
 WITH (
     FORMAT = 'CSV',
@@ -131,7 +135,7 @@ WITH (
 SET IDENTITY_INSERT Zdarzenie ON;
 
 MERGE INTO Zdarzenie AS target
-USING #Zdarzenie_Temp AS source
+USING Zdarzenie_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET typ_zdarzenia = source.typ_zdarzenia, kategoria = source.kategoria, skala_niebezpieczenstwa = source.skala_niebezpieczenstwa
@@ -140,16 +144,17 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Zdarzenie OFF;
 
-DROP TABLE #Zdarzenie_Temp;
+DROP TABLE Zdarzenie_Temp;
 
 -- Update Stacja records from T2
-CREATE TABLE #Stacja_Temp (
+CREATE TABLE Stacja_Temp
+(
     id INT,
     nazwa VARCHAR(40),
     miasto VARCHAR(40)
 );
 
-BULK INSERT #Stacja_Temp
+BULK INSERT Stacja_Temp
 FROM '/opt/data/T2/Stacja.csv'
 WITH (
     FORMAT = 'CSV',
@@ -162,7 +167,7 @@ WITH (
 SET IDENTITY_INSERT Stacja ON;
 
 MERGE INTO Stacja AS target
-USING #Stacja_Temp AS source
+USING Stacja_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET nazwa = source.nazwa, miasto = source.miasto
@@ -171,10 +176,11 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Stacja OFF;
 
-DROP TABLE #Stacja_Temp;
+DROP TABLE Stacja_Temp;
 
 -- Merge Kurs records from T2
-CREATE TABLE #Kurs_Temp (
+CREATE TABLE Kurs_Temp
+(
     id INT,
     nazwa_trasy VARCHAR(40),
     roznica_czasu INT,
@@ -184,7 +190,7 @@ CREATE TABLE #Kurs_Temp (
     maszynista_id INT
 );
 
-BULK INSERT #Kurs_Temp
+BULK INSERT Kurs_Temp
 FROM '/opt/data/T2/Kurs.csv'
 WITH (
     FORMAT = 'CSV',
@@ -197,7 +203,7 @@ WITH (
 SET IDENTITY_INSERT Kurs ON;
 
 MERGE INTO Kurs AS target
-USING #Kurs_Temp AS source
+USING Kurs_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET nazwa_trasy = source.nazwa_trasy, roznica_czasu = source.roznica_czasu, planowa_data_odjazdu = source.planowa_data_odjazdu, planowa_data_przyjazdu = source.planowa_data_przyjazdu, pociag_id = source.pociag_id, maszynista_id = source.maszynista_id
@@ -206,10 +212,11 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Kurs OFF;
 
-DROP TABLE #Kurs_Temp;
+DROP TABLE Kurs_Temp;
 
 -- Merge Odcinek_kursu records from T2
-CREATE TABLE #Odcinek_kursu_Temp (
+CREATE TABLE Odcinek_kursu_Temp
+(
     id BIGINT,
     kurs_id INT,
     numer_etapu_kursu INT,
@@ -220,7 +227,7 @@ CREATE TABLE #Odcinek_kursu_Temp (
     planowa_data_odjazdu DATETIME
 );
 
-BULK INSERT #Odcinek_kursu_Temp
+BULK INSERT Odcinek_kursu_Temp
 FROM '/opt/data/T2/Odcinek_kursu.csv'
 WITH (
     FORMAT = 'CSV',
@@ -233,7 +240,7 @@ WITH (
 SET IDENTITY_INSERT Odcinek_kursu ON;
 
 MERGE INTO Odcinek_kursu AS target
-USING #Odcinek_kursu_Temp AS source
+USING Odcinek_kursu_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET kurs_id = source.kurs_id, numer_etapu_kursu = source.numer_etapu_kursu, stacja_wyjazdowa_id = source.stacja_wyjazdowa_id, stacja_wjazdowa_id = source.stacja_wjazdowa_id, roznica_czasu = source.roznica_czasu, planowa_data_przyjazdu = source.planowa_data_przyjazdu, planowa_data_odjazdu = source.planowa_data_odjazdu
@@ -242,11 +249,11 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Odcinek_kursu OFF;
 
-DROP TABLE #Odcinek_kursu_Temp;
+DROP TABLE Odcinek_kursu_Temp;
 
 -- Merge Weather records from T2
-CREATE TABLE #Weather_Temp (
-    id BIGINT,
+CREATE TABLE Weather_Temp
+(
     id_odcinka BIGINT,
     data_pomiaru DATETIME,
     temperatura DECIMAL(4, 1),
@@ -254,7 +261,7 @@ CREATE TABLE #Weather_Temp (
     typ_opadow VARCHAR(10)
 );
 
-BULK INSERT #Weather_Temp
+BULK INSERT Weather_Temp
 FROM '/opt/data/T2/Weather.csv'
 WITH (
     FORMAT = 'CSV',
@@ -264,22 +271,19 @@ WITH (
     TABLOCK
 );
 
-SET IDENTITY_INSERT Weather ON;
-
 MERGE INTO Weather AS target
-USING #Weather_Temp AS source
-ON target.id = source.id
+USING Weather_Temp AS source
+ON target.id_odcinka = source.id_odcinka AND target.data_pomiaru = source.data_pomiaru
 WHEN MATCHED THEN
-    UPDATE SET id_odcinka = source.id_odcinka, data_pomiaru = source.data_pomiaru, temperatura = source.temperatura, ilosc_opadow = source.ilosc_opadow, typ_opadow = source.typ_opadow
+    UPDATE SET temperatura = source.temperatura, ilosc_opadow = source.ilosc_opadow, typ_opadow = source.typ_opadow
 WHEN NOT MATCHED THEN
-    INSERT (id, id_odcinka, data_pomiaru, temperatura, ilosc_opadow, typ_opadow) VALUES (source.id, source.id_odcinka, source.data_pomiaru, source.temperatura, source.ilosc_opadow, source.typ_opadow);
+    INSERT (id_odcinka, data_pomiaru, temperatura, ilosc_opadow, typ_opadow) VALUES (source.id_odcinka, source.data_pomiaru, source.temperatura, source.ilosc_opadow, source.typ_opadow);
 
-SET IDENTITY_INSERT Weather OFF;
-
-DROP TABLE #Weather_Temp;
+DROP TABLE Weather_Temp;
 
 -- Merge Zdarzenie_na_trasie records from T2
-CREATE TABLE #Zdarzenie_na_trasie_Temp (
+CREATE TABLE Zdarzenie_na_trasie_Temp
+(
     id BIGINT,
     odcinek_kursu_id BIGINT,
     przejazd_id INT,
@@ -293,7 +297,7 @@ CREATE TABLE #Zdarzenie_na_trasie_Temp (
     predkosc INT
 );
 
-BULK INSERT #Zdarzenie_na_trasie_Temp
+BULK INSERT Zdarzenie_na_trasie_Temp
 FROM '/opt/data/T2/Zdarzenie_na_trasie.csv'
 WITH (
     FORMAT = 'CSV',
@@ -306,7 +310,7 @@ WITH (
 SET IDENTITY_INSERT Zdarzenie_na_trasie ON;
 
 MERGE INTO Zdarzenie_na_trasie AS target
-USING #Zdarzenie_na_trasie_Temp AS source
+USING Zdarzenie_na_trasie_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
     UPDATE SET odcinek_kursu_id = source.odcinek_kursu_id, przejazd_id = source.przejazd_id, zdarzenie_id = source.zdarzenie_id, wywolane_opoznienie = source.wywolane_opoznienie, liczba_rannych = source.liczba_rannych, liczba_zgonow = source.liczba_zgonow, koszt_naprawy = source.koszt_naprawy, czy_interwencja_sluzb = source.czy_interwencja_sluzb, data = source.data, predkosc = source.predkosc
@@ -315,7 +319,7 @@ WHEN NOT MATCHED THEN
 
 SET IDENTITY_INSERT Zdarzenie_na_trasie OFF;
 
-DROP TABLE #Zdarzenie_na_trasie_Temp;
+DROP TABLE Zdarzenie_na_trasie_Temp;
 
 -- Re-enable constraints
 ALTER TABLE Zdarzenie_na_trasie CHECK CONSTRAINT ALL;
@@ -325,69 +329,3 @@ ALTER TABLE Odcinek_kursu CHECK CONSTRAINT ALL;
 ALTER TABLE Kurs CHECK CONSTRAINT ALL;
 
 ALTER TABLE Weather CHECK CONSTRAINT ALL;
-
--- Display summary
-PRINT 'T2 Data Merge Complete';
-
-PRINT 'Total Pociag records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Pociag
-    ) AS VARCHAR
-);
-
-PRINT 'Total Maszynista records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Maszynista
-    ) AS VARCHAR
-);
-
-PRINT 'Total Stacja records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Stacja
-    ) AS VARCHAR
-);
-
-PRINT 'Total Przejazd records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Przejazd
-    ) AS VARCHAR
-);
-
-PRINT 'Total Zdarzenie records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Zdarzenie
-    ) AS VARCHAR
-);
-
-PRINT 'Total Kurs records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Kurs
-    ) AS VARCHAR
-);
-
-PRINT 'Total Odcinek_kursu records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Odcinek_kursu
-    ) AS VARCHAR
-);
-
-PRINT 'Total Weather records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Weather
-    ) AS VARCHAR
-);
-
-PRINT 'Total Zdarzenie_na_trasie records: ' + CAST(
-    (
-        SELECT COUNT(*)
-        FROM Zdarzenie_na_trasie
-    ) AS VARCHAR
-);
