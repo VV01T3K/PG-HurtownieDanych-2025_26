@@ -109,7 +109,7 @@ T1_CONFIG = SnapshotConfig(
     name="T1",
     start=datetime(2023, 1, 1, 0, 0, 0),
     end=datetime(2024, 6, 30, 23, 59, 59),
-    ride_count=_env_int("RAILGEN_T1_RIDES", 100_000),
+    ride_count=_env_int("RAILGEN_T1_RIDES", 50_000),
     base_event_rate=0.035,
 )
 
@@ -117,7 +117,7 @@ T2_CONFIG = SnapshotConfig(
     name="T2",
     start=datetime(2024, 7, 1, 0, 0, 0),
     end=datetime(2025, 10, 31, 23, 59, 59),
-    ride_count=_env_int("RAILGEN_T2_RIDES", 100_000),
+    ride_count=_env_int("RAILGEN_T2_RIDES", 25_000),
     base_event_rate=0.033,  # global improvement ~5%
 )
 
@@ -201,7 +201,7 @@ class RailwayDataGenerator:
     # ------------------------------------------------------------------
 
     def _build_stations(self) -> None:
-        target_count = self.rng.randint(420, 560)
+        target_count = self.rng.randint(200, 280)
         used_pairs: set[str] = set()
         used_station_names: set[str] = set()
         station_id = 1
@@ -251,7 +251,7 @@ class RailwayDataGenerator:
     # ------------------------------------------------------------------
 
     def _build_crossings(self) -> None:
-        crossing_count = self.rng.randint(9_000, 11_500)
+        crossing_count = self.rng.randint(4_500, 5_750)
         old_share = 0.55
 
         for _ in range(crossing_count):
@@ -318,7 +318,7 @@ class RailwayDataGenerator:
     # ------------------------------------------------------------------
 
     def _build_trains(self) -> None:
-        base_count = self.rng.randint(1_300, 1_650)
+        base_count = self.rng.randint(650, 825)
         operator_weights = {
             "PKP Intercity": 0.22,
             "POLREGIO": 0.24,
@@ -382,7 +382,7 @@ class RailwayDataGenerator:
     # ------------------------------------------------------------------
 
     def _build_drivers(self) -> None:
-        base_count = self.rng.randint(4_500, 5_800)
+        base_count = self.rng.randint(2_250, 2_900)
         for _ in range(base_count):
             record = self._make_driver()
             self.drivers[self.next_driver_id] = record
@@ -462,7 +462,7 @@ class RailwayDataGenerator:
     # ------------------------------------------------------------------
 
     def _build_routes(self) -> None:
-        route_count = self.rng.randint(240, 340)
+        route_count = self.rng.randint(120, 170)
         station_ids = [s.station_id for s in self.stations]
         used_pairs: set[str] = set()
 
