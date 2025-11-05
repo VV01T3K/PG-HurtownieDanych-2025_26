@@ -117,7 +117,7 @@ T2_CONFIG = SnapshotConfig(
     name="T2",
     start=datetime(2024, 7, 1, 0, 0, 0),
     end=datetime(2025, 10, 31, 23, 59, 59),
-    ride_count=_env_int("RAILGEN_T2_RIDES", 25_000),
+    ride_count=_env_int("RAILGEN_T2_RIDES", 50_000),
     base_event_rate=0.033,  # global improvement ~5%
 )
 
@@ -300,17 +300,6 @@ class RailwayDataGenerator:
             self.crossings[self.next_crossing_id] = upgraded
             self.crossings_by_region[upgraded.region].append(self.next_crossing_id)
             self.crossing_upgrade_map[old_id] = self.next_crossing_id
-            # mark old meta with pointer for clarity
-            self.crossings[old_id] = CrossingMeta(
-                crossing_id=old_meta.crossing_id,
-                has_barriers=old_meta.has_barriers,
-                has_light_signals=old_meta.has_light_signals,
-                is_lit=old_meta.is_lit,
-                speed_limit=old_meta.speed_limit,
-                region=old_meta.region,
-                is_old=old_meta.is_old,
-                upgrade_target=self.next_crossing_id,
-            )
             self.next_crossing_id += 1
 
     # ------------------------------------------------------------------
@@ -894,7 +883,7 @@ class RailwayDataGenerator:
             probability *= 1.45
         if (
             crossing_meta is not None
-            and crossing_meta.upgrade_target is not None
+            and crossing_id in self.crossing_upgrade_map
             and scheduled_departure >= UPGRADE_DATE
         ):
             probability *= 0.8
@@ -1023,10 +1012,10 @@ class RailwayDataGenerator:
         crossing_meta = self.crossings[crossing_id]
         if (
             crossing_meta.is_old
-            and crossing_meta.upgrade_target
+            and crossing_id in self.crossing_upgrade_map
             and scheduled_departure >= UPGRADE_DATE
         ):
-            return crossing_meta.upgrade_target
+            return self.crossing_upgrade_map[crossing_id]
         return crossing_id
 
     # ------------------------------------------------------------------
