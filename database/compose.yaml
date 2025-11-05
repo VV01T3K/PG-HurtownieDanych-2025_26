@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    restart: unless-stopped
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - 5434:1433
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+      - /workspaces/PG-HurtownieDanych-2025_26/generator/output:/opt/data
+
+volumes:
+  sqlserverdata:
