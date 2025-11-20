@@ -48,6 +48,7 @@ CREATE TABLE Maszynista_Temp
     id INT,
     imie VARCHAR(30),
     nazwisko VARCHAR(30),
+    pesel CHAR(11),
     plec VARCHAR(10),
     wiek INT,
     rok_zatrudnienia INT
@@ -69,9 +70,9 @@ MERGE INTO Maszynista AS target
 USING Maszynista_Temp AS source
 ON target.id = source.id
 WHEN MATCHED THEN
-    UPDATE SET imie = source.imie, nazwisko = source.nazwisko, plec = source.plec, wiek = source.wiek, rok_zatrudnienia = source.rok_zatrudnienia
+    UPDATE SET imie = source.imie, nazwisko = source.nazwisko, pesel = source.pesel, plec = source.plec, wiek = source.wiek, rok_zatrudnienia = source.rok_zatrudnienia
 WHEN NOT MATCHED THEN
-    INSERT (id, imie, nazwisko, plec, wiek, rok_zatrudnienia) VALUES (source.id, source.imie, source.nazwisko, source.plec, source.wiek, source.rok_zatrudnienia);
+    INSERT (id, imie, nazwisko, pesel, plec, wiek, rok_zatrudnienia) VALUES (source.id, source.imie, source.nazwisko, source.pesel, source.plec, source.wiek, source.rok_zatrudnienia);
 
 SET IDENTITY_INSERT Maszynista OFF;
 

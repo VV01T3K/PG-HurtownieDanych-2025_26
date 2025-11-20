@@ -31,11 +31,13 @@ CREATE TABLE Maszynista
     id INT IDENTITY(1, 1) PRIMARY KEY,
     imie VARCHAR(30) NOT NULL,
     nazwisko VARCHAR(30) NOT NULL,
+    pesel CHAR(11) NOT NULL UNIQUE,
     plec VARCHAR(10) NOT NULL CHECK (plec IN ('man', 'woman')),
     wiek INT NOT NULL CHECK (wiek BETWEEN 18 AND 80),
     rok_zatrudnienia INT NOT NULL CHECK (
         rok_zatrudnienia BETWEEN 1900 AND YEAR(GETDATE())
-    )
+    ),
+    CONSTRAINT chk_pesel_format CHECK (pesel LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
 );
 
 CREATE TABLE Przejazd

@@ -439,6 +439,15 @@ class RailwayDataGenerator:
         max_year = min(current_year, current_year - (age - 21))
         max_year = max(max_year, min_employment_year)
         employment_year = self.rng.randint(min_employment_year, max_year)
+
+        # Calculate birth date from age (as of 2025)
+        birth_year = current_year - age
+        birth_month = self.rng.randint(1, 12)
+        birth_day = self.rng.randint(1, 28)  # Safe for all months
+        birth_date = datetime(birth_year, birth_month, birth_day)
+
+        pesel = self._generate_pesel(birth_date, gender)
+
         return {
             "id": self.next_driver_id,
             "first_name": first_name,
@@ -446,7 +455,63 @@ class RailwayDataGenerator:
             "gender": gender,
             "age": age,
             "employment_year": employment_year,
+            "pesel": pesel,
         }
+
+    def _generate_pesel(self, birth_date: datetime, gender: str) -> str:
+        """Generate a valid Polish PESEL number.
+
+        PESEL format: YYMMDDSSSGC where:
+        - YY = year (last 2 digits)
+        - MM = month (with century encoding)
+        - DD = day
+        - SSS = serial number (3 digits)
+        - G = gender digit (odd for male, even for female)
+        - C = checksum digit
+        """
+        year = birth_date.year
+        month = birth_date.month
+        day = birth_date.day
+
+        # Encode century in month
+        if 1800 <= year <= 1899:
+            month_encoded = month + 80
+        elif 1900 <= year <= 1999:
+            month_encoded = month
+        elif 2000 <= year <= 2099:
+            month_encoded = month + 20
+        elif 2100 <= year <= 2199:
+            month_encoded = month + 40
+        elif 2200 <= year <= 2299:
+            month_encoded = month + 60
+        else:
+            month_encoded = month
+
+        # Format date part: YYMMDD
+        yy = year % 100
+        date_part = f"{yy:02d}{month_encoded:02d}{day:02d}"
+
+        # Generate serial number (3 digits)
+        serial = self.rng.randint(0, 999)
+        serial_part = f"{serial:03d}"
+
+        # Gender digit (odd for male, even for female)
+        if gender == "man":
+            gender_digit = self.rng.choice([1, 3, 5, 7, 9])
+        else:
+            gender_digit = self.rng.choice([0, 2, 4, 6, 8])
+
+        # Combine all parts except checksum
+        pesel_without_checksum = date_part + serial_part + str(gender_digit)
+
+        # Calculate checksum
+        weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3]
+        checksum = 0
+        for i, digit in enumerate(pesel_without_checksum):
+            checksum += int(digit) * weights[i]
+        checksum = (10 - (checksum % 10)) % 10
+
+        return pesel_without_checksum + str(checksum)
 
     # ------------------------------------------------------------------
     # Event dimension
@@ -550,7 +615,7 @@ class RailwayDataGenerator:
         with path.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh, lineterminator="\n")
             writer.writerow(
-                ["id", "imie", "nazwisko", "plec", "wiek", "rok_zatrudnienia"]
+                ["id", "imie", "nazwisko", "pesel", "plec", "wiek", "rok_zatrudnienia"]
             )
             for driver_id in sorted(self.drivers):
                 driver = self.drivers[driver_id]
@@ -559,6 +624,7 @@ class RailwayDataGenerator:
                         driver["id"],
                         driver["first_name"],
                         driver["last_name"],
+                        driver["pesel"],
                         driver["gender"],
                         driver["age"],
                         driver["employment_year"],
