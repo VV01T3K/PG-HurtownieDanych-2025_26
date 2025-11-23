@@ -94,7 +94,8 @@ CREATE TABLE Kolejnosc_odcinkow (
 );
 
 CREATE TABLE Odcinek_kursu (
-    id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) NOT NULL UNIQUE,
+
     id_kurs INT NOT NULL REFERENCES Kurs(id),
     id_pociag INT NOT NULL REFERENCES Pociag(id),
     id_stacja_wyjazdowa INT NOT NULL REFERENCES Stacja(id),
@@ -106,9 +107,25 @@ CREATE TABLE Odcinek_kursu (
     id_planowy_czas_odjazdu INT NOT NULL REFERENCES Czas(id),
     id_junk INT NOT NULL REFERENCES Junk_odcinek_kursu(id),
     id_kolejnosc_odcinkow INT NOT NULL REFERENCES Kolejnosc_odcinkow(id),
+
     temperatura FLOAT,
     roznica_czasu INT,
-    ilosc_opadow INT
+    ilosc_opadow INT,
+
+    CONSTRAINT PK_OdcinekKursu PRIMARY KEY (
+        id,
+        id_kurs,
+        id_pociag,
+        id_stacja_wyjazdowa,
+        id_stacja_wjazdowa,
+        id_maszynista,
+        id_planowa_data_przyjazdu,
+        id_planowa_data_odjazdu,
+        id_planowy_czas_przyjazdu,
+        id_planowy_czas_odjazdu,
+        id_junk,
+        id_kolejnosc_odcinkow
+    )
 );
 
 CREATE TABLE Zdarzenie_na_trasie (
