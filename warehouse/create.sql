@@ -51,14 +51,14 @@ CREATE TABLE Przejazd (
     czy_rogatki BIT NOT NULL,
     czy_sygnalizacja_swietlna BIT NOT NULL,
     czy_oswietlony BIT NOT NULL,
-    dopuszczalna_predkosc VARCHAR(30) NOT NULL
+    dopuszczalna_predkosc VARCHAR(30) NOT NULL CHECK (dopuszczalna_predkosc IN ('do 40 km/h', '40-50 km/h', '50-60 km/h', '60-70 km/h', '70-80 km/h', '80+ km/h'))
 );
 
 CREATE TABLE Zdarzenie (
     id INT IDENTITY(1,1) PRIMARY KEY,
     typ_zdarzenia VARCHAR(30) NOT NULL,
     kategoria VARCHAR(40) NOT NULL,
-    skala_niebezpieczenstwa VARCHAR(40) NOT NULL
+    skala_niebezpieczenstwa VARCHAR(40) NOT NULL CHECK (skala_niebezpieczenstwa IN ('niska', 'średnia', 'wysoka'))
 );
 
 CREATE TABLE Data (
@@ -180,31 +180,31 @@ INSERT INTO Kurs (nazwa_trasy, kategoria_opoznienia) VALUES
 ('Linia 43-22', 'Średnie opóźnienie');
 
 INSERT INTO Przejazd (czy_rogatki, czy_sygnalizacja_swietlna, czy_oswietlony, dopuszczalna_predkosc) VALUES
-(1, 1, 1, '35'),
-(0, 0, 0, '61'),
-(0, 0, 0, '82'),
-(0, 1, 1, '52'),
-(0, 0, 0, '72'),
-(0, 0, 1, '64'),
-(1, 0, 1, '58'),
-(1, 1, 1, '59'),
-(0, 0, 0, '54'),
-(0, 0, 0, '38');
+(1, 1, 1, 'do 40 km/h'),
+(0, 0, 0, '60-70 km/h'),
+(0, 0, 0, '80+ km/h'),
+(0, 1, 1, '50-60 km/h'),
+(0, 0, 0, '70-80 km/h'),
+(0, 0, 1, '60-70 km/h'),
+(1, 0, 1, '50-60 km/h'),
+(1, 1, 1, '50-60 km/h'),
+(0, 0, 0, '50-60 km/h'),
+(0, 0, 0, 'do 40 km/h');
 
 INSERT INTO Zdarzenie (typ_zdarzenia, kategoria, skala_niebezpieczenstwa) VALUES
-('wypadek', 'potrącenie pieszego', '9'),
-('wypadek', 'zderzenie z samochodem', '8'),
-('wypadek', 'wykolejenie', '10'),
-('wypadek', 'zderzenie z innym pociągiem', '10'),
-('incydent', 'opóźnienie organizacyjne', '4'),
-('incydent', 'przekroczenie limitu prędkości', '5'),
-('incydent', 'problem z pasażerem', '3'),
-('awaria', 'usterka hamulców', '7'),
-('awaria', 'usterka sygnalizacji', '6'),
-('awaria', 'awaria lokomotywy', '7'),
-('zdarzenie techniczne', 'planowy postój', '2'),
-('zdarzenie techniczne', 'test systemu', '2'),
-('zdarzenie techniczne', 'brak maszynisty', '3');
+('wypadek', 'potrącenie pieszego', 'wysoka'),
+('wypadek', 'zderzenie z samochodem', 'wysoka'),
+('wypadek', 'wykolejenie', 'wysoka'),
+('wypadek', 'zderzenie z innym pociągiem', 'wysoka'),
+('incydent', 'opóźnienie organizacyjne', 'niska'),
+('incydent', 'przekroczenie limitu prędkości', 'średnia'),
+('incydent', 'problem z pasażerem', 'niska'),
+('awaria', 'usterka hamulców', 'wysoka'),
+('awaria', 'usterka sygnalizacji', 'średnia'),
+('awaria', 'awaria lokomotywy', 'wysoka'),
+('zdarzenie techniczne', 'planowy postój', 'niska'),
+('zdarzenie techniczne', 'test systemu', 'niska'),
+('zdarzenie techniczne', 'brak maszynisty', 'niska');
 
 INSERT INTO Data (rok, miesiac, numer_miesiaca, dzien, pora_roku, dzien_tygodnia) VALUES
 (2023, 'Styczeń', 1, 1, 'Zima', 'Niedziela'),
