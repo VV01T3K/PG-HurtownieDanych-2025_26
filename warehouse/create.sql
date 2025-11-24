@@ -1,5 +1,5 @@
 -- wczesniej CREATE DATABASE hurtownia;
-USE hurtownia;
+USE pociagi_hurtownia;
 
 DROP TABLE IF EXISTS Zdarzenie_na_trasie;
 DROP TABLE IF EXISTS Odcinek_kursu;
@@ -94,7 +94,7 @@ CREATE TABLE Kolejnosc_odcinkow (
 );
 
 CREATE TABLE Odcinek_kursu (
-    id INT IDENTITY(1,1) NOT NULL UNIQUE,
+    id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 
     id_kurs INT NOT NULL REFERENCES Kurs(id),
     id_pociag INT NOT NULL REFERENCES Pociag(id),
@@ -111,21 +111,6 @@ CREATE TABLE Odcinek_kursu (
     temperatura FLOAT,
     roznica_czasu INT,
     ilosc_opadow INT,
-
-    CONSTRAINT PK_OdcinekKursu PRIMARY KEY (
-        id,
-        id_kurs,
-        id_pociag,
-        id_stacja_wyjazdowa,
-        id_stacja_wjazdowa,
-        id_maszynista,
-        id_planowa_data_przyjazdu,
-        id_planowa_data_odjazdu,
-        id_planowy_czas_przyjazdu,
-        id_planowy_czas_odjazdu,
-        id_junk,
-        id_kolejnosc_odcinkow
-    )
 );
 
 CREATE TABLE Zdarzenie_na_trasie (
@@ -263,8 +248,7 @@ INSERT INTO Junk_odcinek_kursu (typ_opadow) VALUES
 ('brak'),
 ('deszcz'),
 ('snieg'),
-('grad'),
-('deszcz');
+('grad');
 
 INSERT INTO Junk_zdarzenie (czy_interwencja_sluzb) VALUES
 (1),
@@ -297,6 +281,6 @@ INSERT INTO Odcinek_kursu (id_kurs, id_pociag, id_stacja_wyjazdowa, id_stacja_wj
 (3, 3, 8, 10, 3, 3, 3, 16, 17, 5, 4, -0.8, 0, 5);
 
 INSERT INTO Zdarzenie_na_trasie (id_odcinek_kursu, id_przejazd, id_zdarzenie, id_junk, id_data_zdarzenia, id_czas_zdarzenia, koszt_naprawy, predkosc, wywolane_opoznienie, liczba_rannych, liczba_zgonow) VALUES
-(2, 1, 5, 1, 1, 9, 2500.50, 65, 5, 0, 0),
+(2, 1, 5, 1, 1, 9, 2500.50, 65, 5, 1, 0),
 (6, 2, 6, 2, 2, 12, 3200.00, 58, 3, 0, 0),
 (10, 3, 8, 1, 3, 16, 5600.75, 72, 5, 0, 0);
